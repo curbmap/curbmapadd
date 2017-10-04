@@ -1,0 +1,63 @@
+.navbar-brand,
+.navbar-nav li a {
+  line-height: 100px;
+  height: 100px;
+  padding-top: 0;
+  margin-bottom: 0px;
+}
+.navbar-default {
+  background-color: darkslategray;
+  margin-bottom: 0px;
+  border-color: darkslategray;
+}
+
+@media only screen and (max-device-width: 480px) {
+  .table td {
+    padding: 0px;
+    margin: 0px;
+  }
+
+  #content {
+    float: none;
+    width: 100%;
+  }
+
+  #navigation {
+    float:none;
+    width: auto;
+  }
+
+  .loginbox {
+    padding: 1%;
+    width: 100vw;
+  }
+}
+
+.container {
+  background: darkslategray;
+  height: 100vh;
+  padding-top: 5%;
+}
+
+.loginbox {
+  padding: 3%;
+  width: 33%;
+}
+
+html {
+  background-color: darkslategray;
+}
+
+main {
+  background-color: darkslategray;
+  margin-top: 0px;
+}
+
+body {
+  background-color: darkslategray;
+}
+
+.table td {
+  padding: 0px;
+  margin: 0px;
+}

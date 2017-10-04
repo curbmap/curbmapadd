@@ -1,0 +1,180 @@
+<ng-template #modalReviewInfo>
+    <div class="modal-header">
+        <h4 class="modal-title pull-left">Review Restrictions</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="closeReviewRestrModal()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body restriction" id="modalReviewInfoBody">
+        <div class="restr-holder">
+            <div class="container col-sm-12" *ngFor="let restr of markerToSet.restriction" >
+                <div class="row" [ngClass]="[restr.type, 'restr-top-row']">
+                    <div class="col-xs-5 restr-name">
+                        {{outputFullName(restr.type)}}
+                    </div>
+                    <div class="col-xs-5 restr-name">
+                        Angle to curb:{{degreesToType(restr.angle)}}
+                    </div>
+                    <div class="col-xs-2 restr-name up-vote" *ngIf="restr.id !== undefined">
+                        <i class="fa fa-toggle-up fa-2x" aria-hidden="true" (click)="upVote(restr)" ></i>+
+                    </div>
+                </div>
+                <div class="row" [ngClass]="{'rednp': (restr.type === 'rednp' || restr.type === 'redns' || restr.type === 'hyd'),
+                                            'yel': restr.type === 'yel' || restr.type === 'com',
+                                            'gre': restr.type === 'gre',
+                                            'dis': restr.type === 'dis',
+                                            'tim': restr.type === 'tim',
+                                            'met': restr.type === 'met',
+                                            'whi': restr.type === 'whi',
+                                            'restr-mid-row': restr.type === 'tim' || restr.type === 'met',
+                                            'restr-bot-row': restr.type !== 'tim' && restr.type !== 'met'
+                 }">
+                    <div class="col-xs-5 restr-name">
+                        <i class="fa fa-clock-o fa-2x"></i>
+                        {{minutesToMilitary(restr.startTime)}} -
+                        {{minutesToMilitary(restr.endTime)}}
+                    </div>
+                    <div class="col-xs-5 restr-name">
+                        <i class="fa fa-calendar fa-2x"></i> &nbsp;<span [innerHTML]="outputDays(restr.days)"></span>
+                    </div>
+                    <div class="col-xs-2 restr-name down-vote" *ngIf="restr.id !== undefined">
+                        <i class="fa fa-toggle-down fa-2x" aria-hidden="true" (click)="downVote(restr)" *ngIf="restr.id !== undefined"></i>-
+                    </div>
+                    <div class="col-xs-2 restr-name" *ngIf="restr.id === undefined">
+                        <i class="fa fa-times fa-2x delete" aria-hidden="true" (click)="delete(restr)" *ngIf="restr.id === undefined"></i>
+                    </div>
+                </div>
+                <div class="row" [ngClass]="[restr.type, 'restr-bot-row']" *ngIf="restr.type === 'met' || restr.type === 'tim'">
+                    <div class="col-xs-4 restr-name">
+                        Time limit: {{restr.timeLimit}}
+                    </div>
+                    <div class="col-xs-4 restr-name" *ngIf="restr.type === 'met'">
+                        Cost: ${{restr.cost}}
+                    </div>
+                    <div class="col-xs-4 restr-name" *ngIf="restr.type === 'met'">
+                        Every: {{restr.per}} minutes
+                    </div>
+                </div>
+                <br>
+            </div>
+            <br>
+        </div>
+        <br>
+        <button class="pull-left btn btn-info" (click)="moreRules(modalAddInfo)"><i class="fa fa-plus"></i> Add another</button>
+        <button class="pull-right btn btn-success" (click)="doneWithRules()"><i class="fa fa-check-square-o"> </i> Done</button>
+        <br>
+    </div>
+</ng-template>
+
+<ng-template #modalAddInfo>
+    <div class="modal-header">
+        <h4 class="modal-title pull-left">You can't stop</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="closeAddRestrModal(modalReviewInfo)">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+
+    <div class="modal-body">
+        <form [formGroup]="addInfoForm" id="addInfoForm" class="form">
+            <div class="form-group">
+                <select class="form-control" formControlName="restr">
+                    <option *ngFor="let restr of restrSelector" [value]="restr.value">{{restr.print}}</option>
+                </select>
+            </div>
+            <div class="text-center">
+                <div class="form-group text-center">
+                    <div class="btn-group btn-group text-center" role="group">
+                        <label class="btn btn-danger" formControlName="su" #su id="su" btnCheckbox>Su</label>
+                        <label class="btn btn-danger" formControlName="mo" #mo id="mo" btnCheckbox>Mo</label>
+                        <label class="btn btn-danger" formControlName="tu" #tu id="tu" btnCheckbox>Tu</label>
+                        <label class="btn btn-danger" formControlName="we" #we id="we" btnCheckbox>We</label>
+                        <label class="btn btn-danger" formControlName="th" #th id="th" btnCheckbox>Th</label>
+                        <label class="btn btn-danger" formControlName="fr" #fr id="fr" btnCheckbox>Fr</label>
+                        <label class="btn btn-danger" formControlName="sa" #sa id="sa" btnCheckbox>Sa</label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <input type="button" class="btn btn-default" style="width: 100%;" (click)="clickAllDays()" #alldays id="alldays" value="Deselect all days">
+            </div>
+            <b>How long is the restriction for?</b>
+            <div class="form-group table-responsive" *ngIf="!all_day">
+                <table style="width: 100%">
+                    <tr>
+                        <td style="width: 50%;" class="pull-left">
+                            <b>From:</b>
+                        </td>
+                        <td style="width: 50%;" class="pull-right">
+                            <b>To:</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 50%;" class="pull-left">
+                            <timepicker formControlName="startTime" [showMeridian]="false"></timepicker>
+                        </td>
+                        <td style="width: 50%;" class="pull-right">
+                            <timepicker formControlName="endTime" [showMeridian]="false"></timepicker>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="form-group">
+                <div class="btn-group" role="group" style="width: 100%; text-align: center;">
+                    <label class="btn btn-danger" formControlName="all_day" id="allday" btnCheckbox style="width: 100%;">All day</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="btn-group" style="width: 100%;">
+                    <label class="btn btn-info" btnRadio="0" [(ngModel)]="angle" [ngModelOptions]="{standalone: true}">parallel</label>
+                    <label class="btn btn-info" btnRadio="45" [(ngModel)]="angle" [ngModelOptions]="{standalone: true}">angled</label>
+                    <label class="btn btn-info" btnRadio="90" [(ngModel)]="angle" [ngModelOptions]="{standalone: true}">head in</label>
+                </div>
+                <div class="form-group">
+                    <img *ngIf="angle==='0'" src="img/parallel.png" />
+                    <img *ngIf="angle==='45'" src="img/angled.png" />
+                    <img *ngIf="angle==='90'" src="img/headin.png" />
+                </div>
+            </div>
+            <div class="form-group text-right">
+                <input #submitButton type="button" class="btn btn-success" value="Finished with this rule >" (click)="nextAddRestrModal(modalReviewInfo)">
+            </div>
+        </form>
+    </div>
+</ng-template>
+
+<agm-map  #map id="map"
+          [disableDefaultUI]="false"
+          [latitude]="mapTopLeft.lat"
+          [longitude]="mapTopLeft.lng"
+          [disableDoubleClickZoom]="true"
+          [mapTypeId]="mapType.value"
+          [zoom]="zoom"
+          (centerChange)="centerChanged($event)"
+          (boundsChange)="boundsChanged($event)"
+          (idle)="enteredIdle()"
+>
+    <agm-marker *ngIf="centerMarker !== null"
+                [latitude]="centerMarker.point.lat"
+                [longitude]="centerMarker.point.lng"
+                [opacity]="centerMarker.opacity"
+                [iconUrl]="centerMarker.url"
+                [markerDraggable]="centerMarker.draggable"
+                (markerClick)="clickMainMarker(modalAddInfo)"
+    >
+        <agm-info-window [isOpen]="centerMarkerIsOpen">
+            {{centerMarker.info}}
+        </agm-info-window>
+    </agm-marker>
+    <agm-marker *ngFor="let m of markers"
+                [latitude]="m.point.lat"
+                [longitude]="m.point.lng"
+                [opacity]="m.opacity"
+                [iconUrl]="m.url"
+                (markerClick)="clickOtherMarker(m, modalReviewInfo)"
+    >
+    </agm-marker>
+</agm-map>
+<div class="curbfooter">
+    <button class='btn btn-info' (click)='recenter()'>re-center</button>
+    <button class='pull-right btn btn-info' (click)='showHelp()'>help</button>
+</div>
